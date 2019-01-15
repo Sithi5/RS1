@@ -70,16 +70,14 @@ echo "$_GREEN==================================================================$
 echo "$_GREEN			LAN ADDR"
 echo "$_GREEN==================================================================$_DEF\n"
 
-read -p "Ip Address('Default:10.0.2.55'):" ADDRV4
-ADDRV4=${ADDRV:-10.0.2.55}
-
-read -p "Netmask('Default'):255.255.255.252" NETMASK
-NETMASK=${NETMASK:-255.255.255.252}
-
-echo "allow-hotplug enp0s8" >> /etc/network/interfaces
-echo "iface enp0s8 inet static" >> /etc/network/interfaces
-echo "netmask $NETMASK" >> /etc/network/interfaces
-echo "address $ADDRV4" >> /etc/network/interfaces
+cp /etc/network/interfaces /etc/network/interfaces-save
+var1='iface enp0s3 inet dhcp'
+var2='iface enp0s8 inet static'
+sed -i -e 's/'"$var1"'/'"$var2"'/g' /etc/network/interfaces
+var1='allow-hotplug enp0s3'
+var2='allow-hotplug enp0s8'
+sed -i -e 's/'"$var1"'/'"$var2"'/g' /etc/network/interfaces
+echo "\taddress 10.13.254.145\n\tgateway 10.13.254.254\n\tnetmask 255.255.255.252\n\tdns-nameservers 8.8.8.8 10.13.254.254" >> /etc/network/interfaces
 
 echo "\n"
 echo "$_GREEN==================================================================$_DEF\n"
