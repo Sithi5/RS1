@@ -1,29 +1,34 @@
-#!/bin/bash
+rm /var/www/html/index.html
+rm -rf /var/www/web_deploy
+git clone https://github.com/Sithi5/website-rs1.git /var/www/web_deploy
+cp /var/www/web_deploy/index.html /var/www/html/index.html
 
-# Colors
-_BLACK='\033[30m'
-_RED='\033[31m'
-_GREEN='\033[32m'
-_YELLOW='\033[33m'
-_BLUE='\033[34m'
-_PURPLE='\033[35m'
-_CYAN='\033[36m'
-_GREY='\033[37m'
-
-# Text format
-_DEF='\033[0m'
-_GRAS='\033[1m'
-_SOUL='\033[4m'
-_CLIG='\033[5m'
-_SURL='\033[7m'
-
-echo "\n"
 echo "$_GREEN==================================================================$_DEF\n"
-echo "$_GREEN			Updating...."
+mkdir -p /etc/ssl/localcerts
+
 echo "$_GREEN==================================================================$_DEF\n"
+openssl req -new -x509 -days 365 -nodes -out /etc/ssl/localcerts/apache.pem -keyout /etc/ssl/localcerts/apache.key
 
-cd /var/www/web_deploy
-git pull -q
+echo "$_GREEN==================================================================$_DEF\n"
+chmod 600 /etc/ssl/localcerts/apache*
 
-rm /var/www/html/*
-cp /var/www/web_deploy/* /var/www/html/
+echo "$_GREEN==================================================================$_DEF\n"
+a2enmod ssl
+
+echo "$_GREEN==================================================================$_DEF\n"
+mv /home/malo/ssl.conf /etc/apache2/sites-available/ssl.conf
+
+echo "$_GREEN==================================================================$_DEF\n"
+a2ensite ssl.conf
+
+echo "$_GREEN==================================================================$_DEF\n"
+a2dissite default-ssl.conf
+
+echo "$_GREEN==================================================================$_DEF\n"
+rm /etc/apache2/ports.conf
+
+echo "$_GREEN==================================================================$_DEF\n"
+mv /home/malo/ports.conf /etc/apache2/ports.conf
+
+echo "$_GREEN==================================================================$_DEF\n"
+systemctl restart apache2

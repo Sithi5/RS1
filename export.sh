@@ -55,7 +55,9 @@ echo "$_GREEN Connecting with Username $Username, in Port $Port, at address $Hos
 
 echo "$_GREEN Connecting to ssh...$_DEF"
 ssh $Username@$Hostaddress -p $Port
-echo "\nAfter launching the install script, you should add bridged adapter in your vm"
+echo "$_GREEN\nWaiting for VM to shutdown...$_DEF"
+sleep 5
+echo "$_GREEN\nAfter launching the install script, you should add bridged adapter in your vm$_DEF"
 echo "$_GREEN Would you like to add it ? (yes - no)$_DEF"
 read input
 if [ "$input" == "yes" ]; then
@@ -63,5 +65,6 @@ if [ "$input" == "yes" ]; then
 	read vmname
 	VBoxManage modifyvm $vmname --acpi on --boot1 dvd --nic2 bridged --bridgeadapter1 eth0
 fi
+echo "$_GREEN You have to manually change the SSH port of your NAT adapter.$_DEF"
 
 

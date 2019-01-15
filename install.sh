@@ -56,6 +56,8 @@ apt-get install -y nmap
 echo "$_GREEN==================================================================$_DEF\n"
 apt-get install -y net-tools
 echo "$_GREEN==================================================================$_DEF\n"
+apt-get install -y git
+echo "$_GREEN==================================================================$_DEF\n"
 
 echo "\n"
 echo "Adding sudo user... Username ? (default: 'tom')"
@@ -102,18 +104,7 @@ var1='#PasswordAuthentication yes'
 var1='PasswordAuthentication no'
 sed -i -e 's/'"$var1"'/'"$var2"'/g' /etc/ssh/sshd_config
 
-echo "\n"
-echo "$_GREEN==================================================================$_DEF\n"
-echo "$_GREEN			HOST_CONFIG FORT MAIL"
-echo "$_GREEN==================================================================$_DEF\n"
 
-cp /etc/hosts /etc/hosts-save
-
-var1='127.0.0.1	localhost'
-var2='127.0.0.1	localhost.localdomain localhost debian'
-sed -i -e 's/'"$var1"'/'"$var2"'/g' /etc/hosts
-
-apt-get install -y sendmail
 
 echo "\n"
 echo "$_GREEN==================================================================$_DEF\n"
@@ -132,6 +123,7 @@ echo "# SSH\n" >> /etc/iptables/rules.v4
 echo "-A INPUT -p tcp -m tcp --dport 5022 -j ACCEPT\n" >> /etc/iptables/rules.v4
 echo "-A OUTPUT -p tcp -m tcp --dport 5022 -j ACCEPT\n" >> /etc/iptables/rules.v4
 echo "\n#mail\n" >> /etc/iptables/rules.v4
+echo "-A INPUT -p tcp --dport 25 -j ACCEPT\n" >> /etc/iptables/rules.v4
 echo "-A OUTPUT -p tcp --dport 25 -j ACCEPT\n" >> /etc/iptables/rules.v4
 echo "\n# authorise hht\n" >> /etc/iptables/rules.v4
 echo "-A INPUT -p tcp -m multiport --dports 80,443 -j ACCEPT\n\n" >> /etc/iptables/rules.v4
@@ -214,10 +206,6 @@ echo "0 4 0 0 1 root /usr/bin/apt-get update | tee /var/log/update_script.log\n"
 echo "@reboot root /usr/bin/apt-get update | tee /var/log/update_script.log\n" >> /etc/crontab
 echo "0 0 * * * root /root/check-file.sh" >> /etc/crontab
 
-################################################################
-#cp /etc/crontab /etc/crontab-save
-################################################################
-
 echo "\n"
 echo "$_GREEN==================================================================$_DEF\n"
 echo "$_GREEN			SCRIPT_CONFIG"
@@ -231,9 +219,24 @@ echo "$_GREEN==================================================================$
 echo "$_GREEN			Website_Config..."
 echo "$_GREEN==================================================================$_DEF\n"
 
-git clone https://github.com/Sithi5/website-rs1.git /var/www/web_deploy
-
 rm /var/www/html/index.html
 cp index.html /var/www/html/index.html
 
-systemctl restart apache2
+sh website_update.sh
+
+echo "\n"
+echo "$_GREEN==================================================================$_DEF\n"
+echo "$_GREEN			HOST_CONFIG FOR MAIL"
+echo "$_GREEN==================================================================$_DEF\n"
+
+cp /etc/hosts /etc/hosts-save
+
+var1='127.0.0.1	localhost'
+var2='127.0.0.1	localhost.localdomain localhost debian'
+sed -i -e 's/'"$var1"'/'"$var2"'/g' /etc/hosts
+
+apt-get install -y sendmail
+
+echo "$_GREEN==================================================================$_DEF\n"
+echo "$_GREEN Server will shutdown now... change port of ssh in NAT adapter and add bridged adapter please. $_DEF\n"
+shutdown now
