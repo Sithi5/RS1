@@ -23,6 +23,7 @@ a2ensite ssl.conf
 
 echo "$_GREEN==================================================================$_DEF\n"
 a2dissite default-ssl.conf
+a2dissite 000-default.conf
 
 echo "$_GREEN==================================================================$_DEF\n"
 rm /etc/apache2/ports.conf

@@ -17,6 +17,18 @@ _SOUL='\033[4m'
 _CLIG='\033[5m'
 _SURL='\033[7m'
 
+clear
+echo  "$_PURPLE"
+echo " ██▓███   ▒█████   █     █░▓█████  ██▀███      ██▀███   ▒█████    ▄████ ▓█████  ██▀███"
+echo "▓██░  ██▒▒██▒  ██▒▓█░ █ ░█░▓█   ▀ ▓██ ▒ ██▒   ▓██ ▒ ██▒▒██▒  ██▒ ██▒ ▀█▒▓█   ▀ ▓██ ▒ ██▒"
+echo "▓██░ ██▓▒▒██░  ██▒▒█░ █ ░█ ▒███   ▓██ ░▄█ ▒   ▓██ ░▄█ ▒▒██░  ██▒▒██░▄▄▄░▒███   ▓██ ░▄█ ▒"
+echo "▒██▄█▓▒ ▒▒██   ██░░█░ █ ░█ ▒▓█  ▄ ▒██▀▀█▄     ▒██▀▀█▄  ▒██   ██░░▓█  ██▓▒▓█  ▄ ▒██▀▀█▄"
+echo "▒██▒ ░  ░░ ████▓▒░░░██▒██▓ ░▒████▒░██▓ ▒██▒   ░██▓ ▒██▒░ ████▓▒░░▒▓███▀▒░▒████▒░██▓ ▒██▒"
+echo "▒▓▒░ ░  ░░ ▒░▒░▒░ ░ ▓░▒ ▒  ░░ ▒░ ░░ ▒▓ ░▒▓░   ░ ▒▓ ░▒▓░░ ▒░▒░▒░  ░▒   ▒ ░░ ▒░ ░░ ▒▓ ░▒▓░"
+echo "░▒ ░       ░ ▒ ▒░   ▒ ░ ░   ░ ░  ░  ░▒ ░ ▒░     ░▒ ░ ▒░  ░ ▒ ▒░   ░   ░  ░ ░  ░  ░▒ ░ ▒░"
+echo "░░       ░ ░ ░ ▒    ░   ░     ░     ░░   ░      ░░   ░ ░ ░ ░ ▒  ░ ░   ░    ░     ░░   ░"
+echo "             ░ ░      ░       ░  ░   ░           ░         ░ ░        ░    ░  ░   ░" 
+echo  "$_DEF"
 
 echo "\n"
 echo "$_GREEN==================================================================$_DEF\n"
@@ -79,7 +91,10 @@ sed -i -e 's/'"$var1"'/'"$var2"'/g' /etc/network/interfaces
 var1='allow-hotplug enp0s3'
 var2='allow-hotplug enp0s8'
 sed -i -e 's/'"$var1"'/'"$var2"'/g' /etc/network/interfaces
-echo "\taddress 10.13.254.145\n\tgateway 10.13.254.254\n\tnetmask 255.255.255.252\n\tdns-nameservers 8.8.8.8 10.13.254.254" >> /etc/network/interfaces
+echo "Dans que cluster etes-vous ?"
+read Cluster
+Cluster=${Cluster:-"2"}
+echo "\taddress 10.1$Cluster.254.154\n\tgateway 10.1$Cluster.254.254\n\tnetmask 255.255.255.252\n\tdns-nameservers 8.8.8.8 10.1$Cluster.254.254" >> /etc/network/interfaces
 
 echo "\n"
 echo "$_GREEN==================================================================$_DEF\n"
@@ -100,11 +115,7 @@ var1='#PubkeyAuthentication yes'
 var2='PubkeyAuthentication yes'
 sed -i -e 's/'"$var1"'/'"$var2"'/g' /etc/ssh/sshd_config
 
-var1='#PasswordAuthentication yes'
-var1='PasswordAuthentication no'
-sed -i -e 's/'"$var1"'/'"$var2"'/g' /etc/ssh/sshd_config
-
-
+sed -i -e 's/'"#PasswordAuthentication yes"'/'"PasswordAuthentication no"'/g' /etc/ssh/sshd_config
 
 echo "\n"
 echo "$_GREEN==================================================================$_DEF\n"
@@ -193,18 +204,9 @@ cp /etc/crontab /etc/crontab-save
 
 rm -rf /etc/crontab
 
-echo "SHELL=/bin.sh\n" >> /etc/crontab
-echo "PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin\n\m" >> /etc/crontab
-
-echo "# m h dom mon dow user command\n" >> /etc/crontab
-echo "17 * * * * root cd / && run-parts --report /etc/cron.hourly\n" >> /etc/crontab
-echo "25 6 * * * root test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )\n" >> /etc/crontab
-echo "47 6 * * 7 root test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )\n" >> /etc/crontab
-echo "52 6 1 * * root test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )\n" >> /etc/crontab
-
-echo "0 4 0 0 1 root /usr/bin/apt-get update | tee /var/log/update_script.log\n" >> /etc/crontab
-echo "@reboot root /usr/bin/apt-get update | tee /var/log/update_script.log\n" >> /etc/crontab
-echo "0 0 * * * root /root/check-file.sh" >> /etc/crontab
+echo '00 4    * * 1   root    apt update > /var/log/update-script.log && apt upgrade -y >> /var/log/update-script.log' >> /etc/crontab
+echo '@reboot         root    apt update > /var/log/update-script.log && apt upgrade -y >> /var/log/update-script.log' >> /etc/crontab
+echo '00 0    * * *   root    /root/crontab-survey.sh' >> /etc/crontab
 
 echo "\n"
 echo "$_GREEN==================================================================$_DEF\n"
